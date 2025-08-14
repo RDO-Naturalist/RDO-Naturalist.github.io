@@ -45,7 +45,8 @@
     border-bottom:1px solid var(--line);
   }
   .wrap{max-width:980px;margin:0 auto;padding:14px}
-  h1{margin:0 0 6px;font-size:clamp(18px,4.5vw,24px)}
+  h1{margin:0 0 6px;font-size:clamp(18px,4.5vw,24px);display:flex;align-items:center;gap:10px}
+  .logo{width:22px;height:22px;border-radius:4px;display:inline-block}
   .sub{color:var(--muted);font-size:13px}
 
   /* HEADER COMPACT */
@@ -134,7 +135,7 @@
     .section-body .cards-grid{ grid-template-columns:repeat(auto-fit,minmax(350px,1fr)) }
   }
 
-  /* ANIMAL CARD (layout v2: thumb left, info right, meta+checklist full width) */
+  /* ANIMAL CARD */
   .card{
     display:grid; gap:var(--gap-card);
     background:var(--card); border:1px solid var(--line); border-radius:var(--radius-card);
@@ -169,15 +170,94 @@
   .tick:active{transform:scale(.98)}
   .pct{min-width:46px;text-align:right;color:var(--muted);font-variant-numeric:tabular-nums}
   .count{color:var(--muted);font-size:12px;margin-left:auto}
+
+  /* AUTH OVERLAY */
+  #authOverlay{
+    position:fixed; inset:0; z-index:9999;
+    display:flex; align-items:center; justify-content:center;
+    background:rgba(6,10,16,.75); backdrop-filter: blur(6px);
+  }
+  #authCard{
+    width:min(96vw,420px);
+    background:var(--card); border:1px solid var(--line); border-radius:18px; padding:18px;
+    color:var(--ink);
+    box-shadow:0 10px 30px rgba(0,0,0,.35);
+  }
+  #authCard h2{ margin:0 0 12px; font-size:20px }
+  #authCard p{ margin:0 0 10px; color:var(--muted); font-size:14px }
+  #authForm{ display:grid; gap:10px; margin-top:8px }
+  #authForm input{
+    height:48px; border-radius:12px; border:1px solid var(--line);
+    background:var(--btn); color:var(--btn-ink); padding:0 12px;
+  }
+  #authForm button{
+    height:48px; border-radius:12px; border:1px solid var(--btn-line);
+    background:var(--btn); color:var(--btn-ink); font-weight:700;
+  }
+  #authMsg{ color:var(--muted); font-size:13px; min-height:1.2em }
+  #signOutBtn{ margin-left:8px }
+
+  /* CONFLICT MODAL */
+  #conflictOverlay{
+    position:fixed; inset:0; z-index:10000;
+    display:none; align-items:center; justify-content:center;
+    background:rgba(6,10,16,.75); backdrop-filter: blur(6px);
+  }
+  #conflictCard{
+    width:min(96vw,460px);
+    background:var(--card); border:1px solid var(--line); border-radius:18px; padding:18px;
+    color:var(--ink); box-shadow:0 10px 30px rgba(0,0,0,.35);
+  }
+  #conflictCard h3{ margin:0 0 8px; font-size:18px }
+  #conflictCard p{ margin:0 0 12px; color:var(--muted); font-size:14px }
+  .counts{ display:flex; gap:12px; font-size:13px; color:var(--muted); margin-bottom:12px }
+  .counts span{ padding:6px 10px; border:1px solid var(--line); border-radius:999px; background:var(--chip) }
+  .btn-row{ display:flex; gap:10px; }
+  .btn-primary{
+    height:48px; border-radius:12px; border:1px solid var(--btn-line);
+    background:var(--btn); color:var(--btn-ink); font-weight:800; flex:1;
+  }
+  .btn-ghost{
+    height:48px; border-radius:12px; border:1px dashed var(--btn-line);
+    background:transparent; color:var(--btn-ink); flex:1;
+  }
 </style>
 </head>
 <body>
+<!-- AUTH OVERLAY (s’affiche si non connecté) -->
+<div id="authOverlay" hidden>
+  <div id="authCard">
+    <h2>Connexion à votre compte</h2>
+    <p>Recevez un lien magique par e-mail pour synchroniser votre progression.</p>
+    <div id="authForm">
+      <input id="authEmail" type="email" placeholder="votre@email.com" autocomplete="email" />
+      <button id="authSend">Recevoir le lien magique ✉️</button>
+      <div id="authMsg"></div>
+    </div>
+  </div>
+</div>
+
+<!-- CONFLICT MODAL (choix LOCAL vs CLOUD) -->
+<div id="conflictOverlay">
+  <div id="conflictCard" role="dialog" aria-modal="true">
+    <h3>Conflit de données</h3>
+    <p>Les données locales et celles du cloud sont différentes. Que voulez-vous faire&nbsp;?</p>
+    <div class="counts">
+      <span id="localCount">Local&nbsp;: 0 actions cochées</span>
+      <span id="cloudCount">Cloud&nbsp;: 0 actions cochées</span>
+    </div>
+    <div class="btn-row">
+      <button id="keepLocalBtn" class="btn-primary">Conserver les données locales</button>
+      <button id="useCloudBtn" class="btn-ghost">Utiliser les données du cloud</button>
+    </div>
+  </div>
+</div>
+
 <header>
   <div class="wrap">
-    <h1>📜 Progression Animaux Légendaires RDO</h1>
-    <div class="sub">Cartes optimisées iPhone • Sauvegarde locale • Thème clair/sombre</div>
+    <h1><img src="assets/favicon.png" alt="Logo" class="logo"> Progression Animaux Légendaires RDO</h1>
+    <div class="sub">Cartes optimisées iPhone • Sauvegarde locale + Cloud • Thème clair/sombre</div>
 
-    <!-- Barre sticky compacte -->
     <div class="controls controls--compact">
       <input id="q" class="input" type="search" placeholder="Rechercher (animal, lieu, condition)…" inputmode="search"/>
       <button id="filtersToggle" class="btn-outline" aria-controls="filtersPanel">🔎 Filtres</button>
@@ -219,6 +299,7 @@
         <button id="uncheckAll">Décocher visibles</button>
         <button id="resetAll">Réinitialiser</button>
         <button id="clearLS" title="Effacer le stockage local">🗑️ Effacer stockage</button>
+        <button id="signOutBtn" class="btn-outline" style="display:none">Se déconnecter</button>
       </div>
 
       <div class="legend">
@@ -351,6 +432,7 @@ const fMission = document.getElementById('fMission');
 const fTag = document.getElementById('fTag');
 const filtersPanel = document.getElementById('filtersPanel');
 const filtersToggleBtn = document.getElementById('filtersToggle');
+const signOutBtn = document.getElementById('signOutBtn');
 
 const baseById = Object.fromEntries(BASE.map((a,i)=>[a.id,{...a, idx:i}]));
 const isOn = key => localStorage.getItem(key)==="true";
@@ -468,6 +550,7 @@ function render(){
       updateRow(idx, card);
       updateGlobal();
       updateAllCategories();
+      scheduleSave();
     }, {passive:true});
   });
 
@@ -576,6 +659,7 @@ document.getElementById('checkAll').addEventListener('click', ()=>{
   });
   updateGlobal();
   updateAllCategories();
+  scheduleSave();
 });
 document.getElementById('uncheckAll').addEventListener('click', ()=>{
   groupsEl.querySelectorAll('.card').forEach(card=>{
@@ -591,10 +675,12 @@ document.getElementById('uncheckAll').addEventListener('click', ()=>{
   });
   updateGlobal();
   updateAllCategories();
+  scheduleSave();
 });
 document.getElementById('resetAll').addEventListener('click', ()=>{
   ANIMALS_BY_IDX.forEach((_,i)=> ACTIONS.forEach(a=> localStorage.removeItem(KEYS.action(i,a.key))));
   render();
+  scheduleSave();
 });
 
 // Chips = toggle action pour cartes visibles
@@ -618,6 +704,7 @@ document.querySelectorAll('[data-action-chip]').forEach(chip=>{
     });
     updateGlobal();
     updateAllCategories();
+    scheduleSave();
   }, {passive:true});
 });
 
@@ -644,77 +731,167 @@ document.addEventListener('DOMContentLoaded', ()=>{
 /* ===== Init ===== */
 render();
 </script>
-<script src="https://unpkg.com/@supabase/supabase-js"></script>
+
+<!-- Supabase SDK + Auth/Sync -->
+<script src="https://unpkg.com/@supabase/supabase-js@2"></script>
 <script>
 const SUPABASE_URL = 'https://qexqtfsvfrjbfisvgfdf.supabase.co';
-const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFleHF0ZnN2ZnJqYmZpc3ZnZmRmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTUyMDA1MzAsImV4cCI6MjA3MDc3NjUzMH0.Cn1bfId6B20aISzghYRLuZ9LmCaOEAv6Pysd1stFVwQ';
+const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFleHF0ZnN2ZnJqYmZpc3ZnZmRmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTUyMDA1MzAsImV4cCI6MjA3MDc3NjUzMH0.Cn1bfId6B20aISzghYRLuZ9LmCaOEAv6Pysd1stFVwQ';
+const supa = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
 
-const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+const overlay = document.getElementById('authOverlay');
+const emailInput = document.getElementById('authEmail');
+const emailBtn = document.getElementById('authSend');
+const authMsg = document.getElementById('authMsg');
+const signOutBtnEl = document.getElementById('signOutBtn');
 
-// Vérifie si connecté
-(async () => {
-    const { data: { session } } = await supabase.auth.getSession();
+const conflictOverlay = document.getElementById('conflictOverlay');
+const keepLocalBtn = document.getElementById('keepLocalBtn');
+const useCloudBtn = document.getElementById('useCloudBtn');
+const localCountEl = document.getElementById('localCount');
+const cloudCountEl = document.getElementById('cloudCount');
 
-    if (!session) {
-        const email = prompt("Entrez votre email pour vous connecter ou vous inscrire :");
-        if (email) {
-            const { error } = await supabase.auth.signInWithOtp({ email });
-            if (!error) alert("Lien magique envoyé par email !");
-            else alert("Erreur : " + error.message);
-        }
-    } else {
-        loadProgress(session.user.id);
-    }
-})();
-
-async function loadProgress(userId) {
-    // Récupère les données depuis Supabase
-    let { data, error } = await supabase
-        .from('progress')
-        .select('data')
-        .eq('user_id', userId)
-        .single();
-
-    if (!error && data) {
-        localStorage.setItem('TBVS_RDO_progress', JSON.stringify(data.data));
-        applyProgressToUI(data.data);
-    }
+/* ---- Serialize localStorage -> JSON object ---- */
+function serializeProgress(){
+  const out = {};
+  for (let i=0; i<localStorage.length; i++){
+    const k = localStorage.key(i);
+    if (!k.startsWith(PREFIX)) continue;
+    const m = k.match(/^TBVS_RDO_(\d+):(.*)$/);
+    if (!m) continue;
+    const idx = m[1], action = m[2];
+    (out[idx] ||= {})[action] = localStorage.getItem(k) === "true";
+  }
+  return out;
 }
 
-async function saveProgress(userId) {
-    let localData = JSON.parse(localStorage.getItem('TBVS_RDO_progress')) || {};
-    await supabase
-        .from('progress')
-        .upsert({ user_id: userId, data: localData });
+/* ---- Apply JSON object -> localStorage + UI ---- */
+function applyProgressObject(obj){
+  // Clear action keys only
+  Object.keys(localStorage).forEach(k=>{
+    if (k.startsWith(PREFIX) && k.includes(':')) localStorage.removeItem(k);
+  });
+  for (const [idx, actions] of Object.entries(obj || {})){
+    for (const [action, val] of Object.entries(actions)){
+      localStorage.setItem(`TBVS_RDO_${idx}:${action}`, String(!!val));
+    }
+  }
+  if (typeof render === 'function') render();
 }
 
-// Exemple : appel de saveProgress quand un checkbox change
-document.addEventListener('change', async e => {
-    if (e.target.matches('.progress-checkbox')) {
-        let progress = collectProgressFromUI();
-        localStorage.setItem('TBVS_RDO_progress', JSON.stringify(progress));
+/* ---- Count checked actions in an object ---- */
+function countChecked(obj){
+  let n=0;
+  for (const actions of Object.values(obj || {})){
+    for (const v of Object.values(actions)) if (v) n++;
+  }
+  return n;
+}
 
-        const { data: { session } } = await supabase.auth.getSession();
-        if (session) {
-            saveProgress(session.user.id);
-        }
+/* ---- Cloud load with stylish prompt ---- */
+function showConflictPrompt(localObj, cloudObj){
+  return new Promise(resolve=>{
+    // update counts
+    localCountEl.textContent = `Local : ${countChecked(localObj)} actions cochées`;
+    cloudCountEl.textContent = `Cloud : ${countChecked(cloudObj)} actions cochées`;
+
+    conflictOverlay.style.display = 'flex';
+    const onLocal = ()=>{ cleanup(); resolve('local'); };
+    const onCloud = ()=>{ cleanup(); resolve('cloud'); };
+    function cleanup(){
+      keepLocalBtn.removeEventListener('click', onLocal);
+      useCloudBtn.removeEventListener('click', onCloud);
+      conflictOverlay.style.display = 'none';
     }
+    keepLocalBtn.addEventListener('click', onLocal);
+    useCloudBtn.addEventListener('click', onCloud);
+  });
+}
+
+async function loadCloudProgressWithPrompt(userId){
+  const { data, error } = await supa.from('progress').select('data').eq('user_id', userId).single();
+  if (error && error.code !== 'PGRST116') { console.error(error); return; }
+
+  const localObj = serializeProgress();
+  const cloudObj = data?.data || null;
+
+  if (!cloudObj){
+    // Cloud vide -> pousser local
+    applyProgressObject(localObj);
+    await supa.from('progress').upsert({ user_id: userId, data: localObj });
+    return;
+  }
+
+  // Si identiques -> appliquer cloud (ou local)
+  const differ = JSON.stringify(localObj) !== JSON.stringify(cloudObj);
+  if (!differ){
+    applyProgressObject(cloudObj);
+    return;
+  }
+
+  // Conflit -> demander
+  const choice = await showConflictPrompt(localObj, cloudObj);
+  if (choice === 'local'){
+    applyProgressObject(localObj); // UI + local
+    await supa.from('progress').upsert({ user_id: userId, data: localObj }); // push local -> cloud
+  } else {
+    applyProgressObject(cloudObj); // cloud -> local
+  }
+}
+
+/* ---- Debounced save ---- */
+let saveTimer=null;
+function scheduleSave(){ clearTimeout(saveTimer); saveTimer=setTimeout(saveCloudProgress, 600); }
+
+async function saveCloudProgress(){
+  const { data: { session } } = await supa.auth.getSession();
+  if (!session?.user) return;
+  const payload = serializeProgress();
+  const { error } = await supa.from('progress').upsert({ user_id: session.user.id, data: payload });
+  if (error) console.error(error);
+}
+
+/* ---- Auth UI ---- */
+emailBtn.addEventListener('click', async (e)=>{
+  e.preventDefault();
+  const email = (emailInput.value || '').trim();
+  if (!email){ authMsg.textContent = "Entre un e-mail valide."; return; }
+  emailBtn.disabled = true;
+  authMsg.textContent = "Envoi du lien…";
+  const { error } = await supa.auth.signInWithOtp({ email, options:{ emailRedirectTo: window.location.href } });
+  if (error){ authMsg.textContent = "Erreur : " + error.message; emailBtn.disabled = false; }
+  else { authMsg.textContent = "Lien magique envoyé ✉️ — vérifie ta boîte mail."; }
 });
 
-// Fonctions à adapter selon ton code existant
-function collectProgressFromUI() {
-    let obj = {};
-    document.querySelectorAll('.progress-checkbox').forEach(cb => {
-        obj[cb.dataset.animal] = cb.checked;
-    });
-    return obj;
-}
+/* ---- Sign out ---- */
+signOutBtnEl.addEventListener('click', async ()=>{
+  await supa.auth.signOut();
+});
 
-function applyProgressToUI(progress) {
-    document.querySelectorAll('.progress-checkbox').forEach(cb => {
-        cb.checked = !!progress[cb.dataset.animal];
-    });
-}
+/* ---- Auth state ---- */
+supa.auth.onAuthStateChange(async (_evt, session)=>{
+  const user = session?.user || null;
+  if (user){
+    overlay.hidden = true;
+    signOutBtnEl.style.display = "inline-block";
+    await loadCloudProgressWithPrompt(user.id);
+  } else {
+    signOutBtnEl.style.display = "none";
+    overlay.hidden = false;
+  }
+});
+
+/* ---- Initial session check ---- */
+(async ()=>{
+  const { data: { session } } = await supa.auth.getSession();
+  if (session?.user){
+    overlay.hidden = true;
+    signOutBtnEl.style.display = "inline-block";
+    await loadCloudProgressWithPrompt(session.user.id);
+  } else {
+    overlay.hidden = false;
+  }
+})();
 </script>
 </body>
 </html>
