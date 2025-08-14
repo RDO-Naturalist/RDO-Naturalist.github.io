@@ -788,10 +788,9 @@ function countChecked(obj){
   return n;
 }
 
-/* ---- Cloud load with stylish prompt ---- */
+/* ---- Conflict modal ---- */
 function showConflictPrompt(localObj, cloudObj){
   return new Promise(resolve=>{
-    // update counts
     localCountEl.textContent = `Local : ${countChecked(localObj)} actions cochées`;
     cloudCountEl.textContent = `Cloud : ${countChecked(cloudObj)} actions cochées`;
 
@@ -808,6 +807,7 @@ function showConflictPrompt(localObj, cloudObj){
   });
 }
 
+/* ---- Load with prompt ---- */
 async function loadCloudProgressWithPrompt(userId){
   const { data, error } = await supa.from('progress').select('data').eq('user_id', userId).single();
   if (error && error.code !== 'PGRST116') { console.error(error); return; }
@@ -816,26 +816,23 @@ async function loadCloudProgressWithPrompt(userId){
   const cloudObj = data?.data || null;
 
   if (!cloudObj){
-    // Cloud vide -> pousser local
     applyProgressObject(localObj);
     await supa.from('progress').upsert({ user_id: userId, data: localObj });
     return;
   }
 
-  // Si identiques -> appliquer cloud (ou local)
   const differ = JSON.stringify(localObj) !== JSON.stringify(cloudObj);
   if (!differ){
     applyProgressObject(cloudObj);
     return;
   }
 
-  // Conflit -> demander
   const choice = await showConflictPrompt(localObj, cloudObj);
   if (choice === 'local'){
-    applyProgressObject(localObj); // UI + local
-    await supa.from('progress').upsert({ user_id: userId, data: localObj }); // push local -> cloud
+    applyProgressObject(localObj);
+    await supa.from('progress').upsert({ user_id: userId, data: localObj });
   } else {
-    applyProgressObject(cloudObj); // cloud -> local
+    applyProgressObject(cloudObj);
   }
 }
 
@@ -851,26 +848,62 @@ async function saveCloudProgress(){
   if (error) console.error(error);
 }
 
-/* ---- Auth UI ---- */
+/* ---- Auth: send magic link with proper redirect + cooldown ---- */
 emailBtn.addEventListener('click', async (e)=>{
   e.preventDefault();
   const email = (emailInput.value || '').trim();
   if (!email){ authMsg.textContent = "Entre un e-mail valide."; return; }
+
   emailBtn.disabled = true;
   authMsg.textContent = "Envoi du lien…";
-  const redirectTo = location.origin + location.pathname;
+
+  const redirectTo = location.origin + location.pathname; // your GH Pages URL
   const { error } = await supa.auth.signInWithOtp({
     email,
-    options: { emailRedirectTo: redirectTo }
+    options:{ emailRedirectTo: redirectTo }
   });
-  if (error){ authMsg.textContent = "Erreur : " + error.message; emailBtn.disabled = false; }
-  else { authMsg.textContent = "Lien magique envoyé ✉️ — vérifie ta boîte mail."; }
+
+  if (error) {
+    // Rate limited or similar -> start a countdown
+    let left = 45;
+    const tick = () => {
+      authMsg.textContent = `Lien déjà envoyé. Réessaie dans ${left}s.`;
+      left--;
+      if (left < 0) {
+        authMsg.textContent = "Tu peux renvoyer un lien si besoin.";
+        emailBtn.disabled = false;
+        clearInterval(timer);
+      }
+    };
+    tick();
+    const timer = setInterval(tick, 1000);
+    return;
+  }
+
+  authMsg.textContent = "Lien magique envoyé ✉️ — vérifie ta boîte mail.";
+  setTimeout(()=>{ emailBtn.disabled = false; }, 45000);
 });
 
 /* ---- Sign out ---- */
 signOutBtnEl.addEventListener('click', async ()=>{
   await supa.auth.signOut();
 });
+
+/* ---- Process magic-link tokens on load (very important) ---- */
+(async () => {
+  // If the URL contains auth params from the magic link, turn them into a session
+  const hasHash = location.hash.includes('access_token') || location.hash.includes('refresh_token');
+  const hasCode = new URLSearchParams(location.search).get('code');
+  if (hasHash || hasCode) {
+    try {
+      await supa.auth.exchangeCodeForSession(window.location.href);
+      // Clean the URL so tokens aren’t visible
+      history.replaceState({}, '', location.origin + location.pathname);
+    } catch (e) {
+      console.error('exchangeCodeForSession failed', e);
+    }
+  }
+})();
 
 /* ---- Auth state ---- */
 supa.auth.onAuthStateChange(async (_evt, session)=>{
