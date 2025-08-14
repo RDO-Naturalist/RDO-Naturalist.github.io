@@ -135,7 +135,7 @@
     .section-body .cards-grid{ grid-template-columns:repeat(auto-fit,minmax(350px,1fr)) }
   }
 
-  /* ANIMAL CARD */
+  /* ANIMAL CARD (thumb + info) */
   .card{
     display:grid; gap:var(--gap-card);
     background:var(--card); border:1px solid var(--line); border-radius:var(--radius-card);
@@ -184,7 +184,9 @@
     box-shadow:0 10px 30px rgba(0,0,0,.35);
   }
   #authCard h2{ margin:0 0 12px; font-size:20px }
-  #authCard p{ margin:0 0 10px; color:var(--muted); font-size:14px }
+  #authTabs{ display:flex; gap:8px; margin-bottom:10px }
+  .tab{ flex:1; height:40px; border-radius:10px; border:1px solid var(--btn-line); background:var(--btn); color:var(--btn-ink); font-weight:700 }
+  .tab[aria-selected="true"]{ outline:2px solid var(--prog-end) }
   #authForm{ display:grid; gap:10px; margin-top:8px }
   #authForm input{
     height:48px; border-radius:12px; border:1px solid var(--line);
@@ -195,6 +197,8 @@
     background:var(--btn); color:var(--btn-ink); font-weight:700;
   }
   #authMsg{ color:var(--muted); font-size:13px; min-height:1.2em }
+  #authActions{ display:flex; justify-content:space-between; align-items:center; gap:8px }
+  #authSmall{ font-size:12px; color:var(--muted) }
   #signOutBtn{ margin-left:8px }
 
   /* CONFLICT MODAL */
@@ -221,18 +225,55 @@
     height:48px; border-radius:12px; border:1px dashed var(--btn-line);
     background:transparent; color:var(--btn-ink); flex:1;
   }
+
+  /* RESET PASSWORD MODAL */
+  #resetOverlay{
+    position:fixed; inset:0; z-index:10001;
+    display:none; align-items:center; justify-content:center;
+    background:rgba(6,10,16,.75); backdrop-filter: blur(6px);
+  }
+  #resetCard{
+    width:min(96vw,420px);
+    background:var(--card); border:1px solid var(--line); border-radius:18px; padding:18px;
+    color:var(--ink); box-shadow:0 10px 30px rgba(0,0,0,.35);
+  }
+  #resetCard h3{ margin:0 0 10px; font-size:18px }
+  #resetForm{ display:grid; gap:10px }
+  #resetForm input, #resetForm button{ height:48px; border-radius:12px; border:1px solid var(--line); background:var(--btn); color:var(--btn-ink); padding:0 12px; }
+  #resetMsg{ color:var(--muted); font-size:13px; min-height:1.2em }
 </style>
 </head>
 <body>
-<!-- AUTH OVERLAY (s’affiche si non connecté) -->
+<!-- AUTH OVERLAY (email + password) -->
 <div id="authOverlay" hidden>
   <div id="authCard">
-    <h2>Connexion à votre compte</h2>
-    <p>Recevez un lien magique par e-mail pour synchroniser votre progression.</p>
+    <h2>Connexion</h2>
+    <div id="authTabs">
+      <button id="tabLogin" class="tab" aria-selected="true">Se connecter</button>
+      <button id="tabSignup" class="tab" aria-selected="false">Créer un compte</button>
+    </div>
     <div id="authForm">
-      <input id="authEmail" type="email" placeholder="votre@email.com" autocomplete="email" />
-      <button id="authSend">Recevoir le lien magique ✉️</button>
+      <input id="authEmail" type="email" placeholder="Email" autocomplete="email" />
+      <input id="authPassword" type="password" placeholder="Mot de passe" autocomplete="current-password" />
+      <button id="authSubmit">Se connecter</button>
+      <div id="authActions">
+        <button id="forgotBtn" class="btn-outline" type="button">Mot de passe oublié ?</button>
+        <div id="authSmall">Les données sont synchronisées avec le cloud.</div>
+      </div>
       <div id="authMsg"></div>
+    </div>
+  </div>
+</div>
+
+<!-- RESET PASSWORD MODAL (after email link redirect) -->
+<div id="resetOverlay">
+  <div id="resetCard" role="dialog" aria-modal="true">
+    <h3>Définir un nouveau mot de passe</h3>
+    <div id="resetForm">
+      <input id="newPass" type="password" placeholder="Nouveau mot de passe" autocomplete="new-password" />
+      <input id="newPass2" type="password" placeholder="Confirmer le mot de passe" autocomplete="new-password" />
+      <button id="resetSubmit">Mettre à jour</button>
+      <div id="resetMsg"></div>
     </div>
   </div>
 </div>
@@ -741,8 +782,12 @@ const supa = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
 
 const overlay = document.getElementById('authOverlay');
 const emailInput = document.getElementById('authEmail');
-const emailBtn = document.getElementById('authSend');
+const passInput = document.getElementById('authPassword');
+const submitBtn = document.getElementById('authSubmit');
 const authMsg = document.getElementById('authMsg');
+const tabLogin = document.getElementById('tabLogin');
+const tabSignup = document.getElementById('tabSignup');
+const forgotBtn = document.getElementById('forgotBtn');
 const signOutBtnEl = document.getElementById('signOutBtn');
 
 const conflictOverlay = document.getElementById('conflictOverlay');
@@ -750,6 +795,25 @@ const keepLocalBtn = document.getElementById('keepLocalBtn');
 const useCloudBtn = document.getElementById('useCloudBtn');
 const localCountEl = document.getElementById('localCount');
 const cloudCountEl = document.getElementById('cloudCount');
+
+const resetOverlay = document.getElementById('resetOverlay');
+const newPassInput = document.getElementById('newPass');
+const newPass2Input = document.getElementById('newPass2');
+const resetSubmit = document.getElementById('resetSubmit');
+const resetMsg = document.getElementById('resetMsg');
+
+/* ---- UI: login/signup tabs ---- */
+let mode = 'login';
+function setMode(m){
+  mode = m;
+  tabLogin.setAttribute('aria-selected', m==='login');
+  tabSignup.setAttribute('aria-selected', m==='signup');
+  submitBtn.textContent = (m==='login') ? 'Se connecter' : 'Créer un compte';
+  passInput.placeholder = (m==='login') ? 'Mot de passe' : 'Créer un mot de passe';
+  authMsg.textContent = '';
+}
+tabLogin.addEventListener('click', ()=> setMode('login'));
+tabSignup.addEventListener('click', ()=> setMode('signup'));
 
 /* ---- Serialize localStorage -> JSON object ---- */
 function serializeProgress(){
@@ -848,62 +912,80 @@ async function saveCloudProgress(){
   if (error) console.error(error);
 }
 
-/* ---- Auth: send magic link with proper redirect + cooldown ---- */
-emailBtn.addEventListener('click', async (e)=>{
+/* ---- Auth: email/password submit ---- */
+submitBtn.addEventListener('click', async (e)=>{
   e.preventDefault();
+  authMsg.textContent = '';
   const email = (emailInput.value || '').trim();
-  if (!email){ authMsg.textContent = "Entre un e-mail valide."; return; }
+  const password = passInput.value || '';
+  if (!email || !password){ authMsg.textContent = "Renseigne l'email et le mot de passe."; return; }
 
-  emailBtn.disabled = true;
-  authMsg.textContent = "Envoi du lien…";
+  submitBtn.disabled = true;
 
-  const redirectTo = location.origin + location.pathname; // your GH Pages URL
-  const { error } = await supa.auth.signInWithOtp({
-    email,
-    options:{ emailRedirectTo: redirectTo }
-  });
-
-  if (error) {
-    // Rate limited or similar -> start a countdown
-    let left = 45;
-    const tick = () => {
-      authMsg.textContent = `Lien déjà envoyé. Réessaie dans ${left}s.`;
-      left--;
-      if (left < 0) {
-        authMsg.textContent = "Tu peux renvoyer un lien si besoin.";
-        emailBtn.disabled = false;
-        clearInterval(timer);
-      }
-    };
-    tick();
-    const timer = setInterval(tick, 1000);
-    return;
+  if (mode === 'login'){
+    const { error } = await supa.auth.signInWithPassword({ email, password });
+    if (error){ authMsg.textContent = error.message; submitBtn.disabled = false; return; }
+    // Success -> onAuthStateChange will hide overlay
+  } else {
+    // signup
+    const redirectTo = location.origin + location.pathname; // for email confirmations if enabled
+    const { data, error } = await supa.auth.signUp({ email, password, options:{ emailRedirectTo: redirectTo } });
+    if (error){ authMsg.textContent = error.message; submitBtn.disabled = false; return; }
+    // If email confirmations enabled, user must confirm before session becomes active.
+    authMsg.textContent = "Compte créé. Vérifie ta boîte mail pour confirmer (si requis).";
+    // If email confirmations disabled, onAuthStateChange will fire immediately.
   }
+});
 
-  authMsg.textContent = "Lien magique envoyé ✉️ — vérifie ta boîte mail.";
-  setTimeout(()=>{ emailBtn.disabled = false; }, 45000);
+/* ---- Forgot password ---- */
+forgotBtn.addEventListener('click', async ()=>{
+  const email = (emailInput.value || '').trim();
+  if (!email){ authMsg.textContent = "Entre d'abord ton email."; return; }
+  authMsg.textContent = "Envoi du lien de réinitialisation…";
+  const redirectTo = location.origin + location.pathname + "?type=recovery";
+  const { error } = await supa.auth.resetPasswordForEmail(email, { redirectTo });
+  authMsg.textContent = error ? ("Erreur : " + error.message) : "Lien envoyé. Vérifie ta boîte mail.";
+});
+
+/* ---- Password reset modal (after clicking email link) ---- */
+async function maybeShowResetModalFromURL(){
+  const params = new URLSearchParams(location.search);
+  const isRecovery = params.get('type') === 'recovery';
+  // Also, Supabase might put tokens in hash — exchange them if present
+  const hasHash = location.hash.includes('access_token') || location.hash.includes('refresh_token');
+  const hasCode = params.get('code');
+
+  if (hasHash || hasCode) {
+    try {
+      await supa.auth.exchangeCodeForSession(window.location.href);
+      history.replaceState({}, '', location.origin + location.pathname + (isRecovery ? '?type=recovery' : ''));
+    } catch(e){ console.error('exchangeCodeForSession failed', e); }
+  }
+  if (isRecovery){
+    resetOverlay.style.display = 'flex';
+  }
+}
+resetSubmit.addEventListener('click', async ()=>{
+  resetMsg.textContent = '';
+  const p1 = newPassInput.value || '';
+  const p2 = newPass2Input.value || '';
+  if (!p1 || p1.length < 6){ resetMsg.textContent = "Min 6 caractères."; return; }
+  if (p1 !== p2){ resetMsg.textContent = "Les mots de passe ne correspondent pas."; return; }
+  resetSubmit.disabled = true;
+  const { error } = await supa.auth.updateUser({ password: p1 });
+  if (error){ resetMsg.textContent = error.message; resetSubmit.disabled = false; return; }
+  resetMsg.textContent = "Mot de passe mis à jour ✅";
+  setTimeout(()=>{
+    resetOverlay.style.display = 'none';
+    // Clean query
+    history.replaceState({}, '', location.origin + location.pathname);
+  }, 800);
 });
 
 /* ---- Sign out ---- */
 signOutBtnEl.addEventListener('click', async ()=>{
   await supa.auth.signOut();
 });
-
-/* ---- Process magic-link tokens on load (very important) ---- */
-(async () => {
-  // If the URL contains auth params from the magic link, turn them into a session
-  const hasHash = location.hash.includes('access_token') || location.hash.includes('refresh_token');
-  const hasCode = new URLSearchParams(location.search).get('code');
-  if (hasHash || hasCode) {
-    try {
-      await supa.auth.exchangeCodeForSession(window.location.href);
-      // Clean the URL so tokens aren’t visible
-      history.replaceState({}, '', location.origin + location.pathname);
-    } catch (e) {
-      console.error('exchangeCodeForSession failed', e);
-    }
-  }
-})();
 
 /* ---- Auth state ---- */
 supa.auth.onAuthStateChange(async (_evt, session)=>{
@@ -918,7 +1000,7 @@ supa.auth.onAuthStateChange(async (_evt, session)=>{
   }
 });
 
-/* ---- Initial session check ---- */
+/* ---- Initial session + recovery check ---- */
 (async ()=>{
   const { data: { session } } = await supa.auth.getSession();
   if (session?.user){
@@ -928,6 +1010,7 @@ supa.auth.onAuthStateChange(async (_evt, session)=>{
   } else {
     overlay.hidden = false;
   }
+  await maybeShowResetModalFromURL();
 })();
 </script>
 </body>
