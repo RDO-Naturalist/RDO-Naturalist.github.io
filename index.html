@@ -858,7 +858,11 @@ emailBtn.addEventListener('click', async (e)=>{
   if (!email){ authMsg.textContent = "Entre un e-mail valide."; return; }
   emailBtn.disabled = true;
   authMsg.textContent = "Envoi du lien…";
-  const { error } = await supa.auth.signInWithOtp({ email, options:{ emailRedirectTo: window.location.href } });
+  const redirectTo = location.origin + location.pathname;
+  const { error } = await supa.auth.signInWithOtp({
+    email,
+    options: { emailRedirectTo: redirectTo }
+  });
   if (error){ authMsg.textContent = "Erreur : " + error.message; emailBtn.disabled = false; }
   else { authMsg.textContent = "Lien magique envoyé ✉️ — vérifie ta boîte mail."; }
 });
