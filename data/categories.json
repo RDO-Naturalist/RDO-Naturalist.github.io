@@ -1,0 +1,68 @@
+[
+    {
+        "key": "dark",
+        "title": "Sombres",
+        "items": [
+            "alligator_teca",
+            "castor_tenebreux",
+            "bison_tatanka",
+            "cerf_ombre",
+            "couguar_sapa",
+            "coyote_ebene",
+            "wapiti_katata",
+            "loup_onyx",
+            "panthere_noctivague",
+            "mouflon_rutile",
+            "orignal_chevalier"
+        ]
+    },
+    {
+        "key": "light",
+        "title": "Clairs",
+        "items": [
+            "castor_lunaire",
+            "bison_winyan",
+            "cerf_des_neiges",
+            "couguar_iguga",
+            "coyote_laiteux",
+            "wapiti_inahme",
+            "loup_pierre_de_lune",
+            "panthere_fantome",
+            "mouflon_gabbro",
+            "orignal_flocon"
+        ]
+    },
+    {
+        "key": "red_blond",
+        "title": "Roux ou sable",
+        "items": [
+            "alligator_dore",
+            "alligator_bandes",
+            "bison_payta",
+            "sanglier_wakpa",
+            "coyote_rubigineux",
+            "wapiti_ozula",
+            "loup_emeraude",
+            "ours_esprit_cotier",
+            "ours_esprit_dore",
+            "castor_zizi",
+            "sanglier_cogi",
+            "orignal_roux"
+        ]
+    },
+    {
+        "key": "patterned",
+        "title": "Tachetés/rayés",
+        "items": [
+            "ours_owiza",
+            "sanglier_icahi",
+            "cerf_pataugeur",
+            "couguar_maza",
+            "renard_ota",
+            "renard_marbre",
+            "renard_croise",
+            "panthere_iwakta",
+            "mouflon_craie"
+        ]
+    }
+]
