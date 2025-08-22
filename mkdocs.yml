@@ -1,1 +1,20 @@
-site_name: My Docs
+site_name: RDO • Naturalist
+site_url: https://rdo-naturalist.github.io/
+
+theme:
+  name: material
+  language: fr
+  features:
+    - navigation.tabs
+    - navigation.sections
+    - navigation.instant
+    - search.suggest
+    - search.highlight
+
+nav:
+  - Accueil: index.md
+
+plugins:
+  - search
+  - minify:
+      minify_html: true
