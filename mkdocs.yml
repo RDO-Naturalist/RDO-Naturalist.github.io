@@ -28,6 +28,7 @@ extra_css:
 
 extra_javascript:
   - https://unpkg.com/@supabase/supabase-js@2
+  - assets/js/auth.js
   - assets/js/tracker.js
 
 use_directory_urls: true
