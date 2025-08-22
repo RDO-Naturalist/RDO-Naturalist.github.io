@@ -10,11 +10,22 @@ theme:
     - navigation.instant
     - search.suggest
     - search.highlight
+    - toc.integrate
 
 nav:
   - Accueil: index.md
+  - Tracker: tracker.md
 
 plugins:
   - search
   - minify:
       minify_html: true
+
+extra_css:
+  - assets/css/tracker.css
+
+extra_javascript:
+  - https://unpkg.com/@supabase/supabase-js@2
+  - assets/js/tracker.js
+
+use_directory_urls: true

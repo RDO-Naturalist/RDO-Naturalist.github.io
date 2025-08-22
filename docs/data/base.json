@@ -1,0 +1,254 @@
+[
+    {
+        "id": "ours_esprit_dore",
+        "name": "Ours esprit doré",
+        "location": "Big Valley",
+        "condition": "Mission"
+    },
+    {
+        "id": "ours_owiza",
+        "name": "Ours Owiza",
+        "location": "Rivière Dakota",
+        "condition": "À l’aube ou au crépuscule"
+    },
+    {
+        "id": "ours_esprit_cotier",
+        "name": "Ours esprit côtier",
+        "location": "Rivière Little Creek",
+        "condition": "En journée"
+    },
+    {
+        "id": "castor_tenebreux",
+        "name": "Castor tenebreux",
+        "location": "Roanoke Ridge",
+        "condition": "Mission"
+    },
+    {
+        "id": "castor_zizi",
+        "name": "Castor Zizi",
+        "location": "Ownjila",
+        "condition": "À l’aube ou au crépuscule"
+    },
+    {
+        "id": "castor_lunaire",
+        "name": "Castor lunaire",
+        "location": "Sud de Elysian Pool, à l’est de Van Horn",
+        "condition": "À l’aube ou au crépuscule sous la pluie"
+    },
+    {
+        "id": "bison_tatanka",
+        "name": "Bison Tatanka",
+        "location": "Champs pétrolifères de Heartland",
+        "condition": "Sous la pluie en journée"
+    },
+    {
+        "id": "bison_winyan",
+        "name": "Bison Winyan",
+        "location": "Nord du lac Isabella",
+        "condition": "De nuit par temps clair"
+    },
+    {
+        "id": "bison_payta",
+        "name": "Bison Payta",
+        "location": "Little Creek",
+        "condition": "Mission"
+    },
+    {
+        "id": "sanglier_cogi",
+        "name": "Sanglier Cogi",
+        "location": "Marais Bluewater",
+        "condition": "À l’aube par temps clair"
+    },
+    {
+        "id": "sanglier_wakpa",
+        "name": "Sanglier Wakpa",
+        "location": "Marais Stillwater",
+        "condition": "Sous la pluie en journée"
+    },
+    {
+        "id": "sanglier_icahi",
+        "name": "Sanglier Icahi",
+        "location": "Est de New Austin",
+        "condition": "Mission"
+    },
+    {
+        "id": "cerf_pataugeur",
+        "name": "Cerf pataugeur",
+        "location": "Lac Flat Iron",
+        "condition": "En journée par temps clair"
+    },
+    {
+        "id": "cerf_des_neiges",
+        "name": "Cerf des neiges",
+        "location": "Bassin Aurora",
+        "condition": "À l’aube par temps clair"
+    },
+    {
+        "id": "cerf_ombre",
+        "name": "Cerf ombré",
+        "location": "Annesburg",
+        "condition": "Mission"
+    },
+    {
+        "id": "couguar_iguga",
+        "name": "Couguar Iguga",
+        "location": "Sud-est des Grandes Plaines (au sud de Blackwater)",
+        "condition": "Au crépuscule par temps orageux"
+    },
+    {
+        "id": "couguar_maza",
+        "name": "Couguar Maza",
+        "location": "Mer de Coronado",
+        "condition": "À l’aube par temps clair"
+    },
+    {
+        "id": "couguar_sapa",
+        "name": "Couguar Sapa",
+        "location": "Nord-est de New Austin",
+        "condition": "Mission"
+    },
+    {
+        "id": "coyote_rubigineux",
+        "name": "Coyote rubigineux",
+        "location": "Pike’s Basin",
+        "condition": "Au crépuscule"
+    },
+    {
+        "id": "coyote_ebene",
+        "name": "Coyote d’ébène",
+        "location": "Sud-est de Strawberry",
+        "condition": "À l’aube et en journée par temps clair"
+    },
+    {
+        "id": "coyote_laiteux",
+        "name": "Coyote laiteux",
+        "location": "Blackwater",
+        "condition": "Mission"
+    },
+    {
+        "id": "wapiti_katata",
+        "name": "Wapiti Katata",
+        "location": "Forêt de Cumberland",
+        "condition": "En journée dans le brouillard"
+    },
+    {
+        "id": "wapiti_ozula",
+        "name": "Wapiti Ozula",
+        "location": "Cholla Springs",
+        "condition": "Au crépuscule et de nuit dans le brouillard"
+    },
+    {
+        "id": "wapiti_inahme",
+        "name": "Wapiti Inahme",
+        "location": "Gorge de l’Araignée",
+        "condition": "Mission"
+    },
+    {
+        "id": "renard_croise",
+        "name": "Renard croisé",
+        "location": "Bayou Nwa",
+        "condition": "Mission"
+    },
+    {
+        "id": "renard_marbre",
+        "name": "Renard marbré",
+        "location": "Colter",
+        "condition": "À l’aube ou au crépuscule par temps clair"
+    },
+    {
+        "id": "renard_ota",
+        "name": "Renard Ota",
+        "location": "Ouest de Rhodes",
+        "condition": "À l’aube ou au crépuscule par temps clair"
+    },
+    {
+        "id": "alligator_dore",
+        "name": "Alligator doré",
+        "location": "Marais de Lagras (au nord de Saint Denis)",
+        "condition": "À l’aube dans le brouillard"
+    },
+    {
+        "id": "alligator_teca",
+        "name": "Alligator Teca",
+        "location": "Rivière Lannahechee (au sud de Saint Denis)",
+        "condition": "De nuit par temps orageux"
+    },
+    {
+        "id": "alligator_bandes",
+        "name": "Alligator à bandes",
+        "location": "Saint Denis",
+        "condition": "Mission"
+    },
+    {
+        "id": "orignal_flocon",
+        "name": "Orignal flocon de neige",
+        "location": "Lagune Barrow",
+        "condition": "De nuit sous la pluie"
+    },
+    {
+        "id": "orignal_roux",
+        "name": "Orignal roux",
+        "location": "Tall Trees",
+        "condition": "Mission"
+    },
+    {
+        "id": "orignal_chevalier",
+        "name": "Orignal chevalier",
+        "location": "Nord de la rivière Kamassa",
+        "condition": "En journée"
+    },
+    {
+        "id": "panthere_noctivague",
+        "name": "Panthère noctivague",
+        "location": "Bolger Glade",
+        "condition": "Au crépuscule dans le brouillard"
+    },
+    {
+        "id": "panthere_fantome",
+        "name": "Panthère fantôme",
+        "location": "Merkins Waller et Macomb’s",
+        "condition": "De nuit sous la pluie"
+    },
+    {
+        "id": "panthere_iwakta",
+        "name": "Panthère Iwakta",
+        "location": "Près du manoir Braithwaite",
+        "condition": "Mission"
+    },
+    {
+        "id": "mouflon_craie",
+        "name": "Mouflon corne craie",
+        "location": "Sud de Cottora Springs",
+        "condition": "En journée par temps clair"
+    },
+    {
+        "id": "mouflon_gabbro",
+        "name": "Mouflon corne gabbro",
+        "location": "Rio Bravo",
+        "condition": "À l’aube et en journée par temps clair"
+    },
+    {
+        "id": "mouflon_rutile",
+        "name": "Mouflon corne rutile",
+        "location": "Rio Bravo et Cholla Springs",
+        "condition": "Mission"
+    },
+    {
+        "id": "loup_emeraude",
+        "name": "Loup émeraude",
+        "location": "O’Creagh’s Run",
+        "condition": "De nuit"
+    },
+    {
+        "id": "loup_onyx",
+        "name": "Loup d’onyx",
+        "location": "Sud du ravin Calumet et Cottora Springs",
+        "condition": "De nuit par temps clair"
+    },
+    {
+        "id": "loup_pierre_de_lune",
+        "name": "Loup pierre de lune",
+        "location": "Nord de la forêt de Cumberland",
+        "condition": "Mission"
+    }
+]
