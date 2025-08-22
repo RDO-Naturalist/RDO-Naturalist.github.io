@@ -1,5 +1,7 @@
 site_name: RDO • Naturalist
 site_url: https://rdo-naturalist.github.io/
+site_description: This project is a dedicated tracker for the Naturalist role in Red Dead Online. It helps players follow their progress by listing legendary animals with their locations, conditions, and unique traits. Each entry can be marked to keep track of samples, skins, and other interactions. While the focus is currently on legendary animals, the tracker is designed to expand and eventually include all species in the game, offering a complete and organized bestiary.
+site_author: TokyoBoy
 
 theme:
   name: material
